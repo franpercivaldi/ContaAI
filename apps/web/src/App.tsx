@@ -33,20 +33,21 @@ export default function App() {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Header className="app-header" style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-        <div style={{ fontWeight: 600 }}>Estudio Contable</div>
-
-        <div className="header-center">
-          <div className="center-buttons">
-            <Button onClick={toggleTheme} type="default">
-              {theme === 'dark' ? <><IconToggleLight/> Modo claro</> : <><IconToggleDark/> Modo oscuro</>}
-            </Button>
-            <Button type="primary" onClick={logout}><IconLogout/> Salir</Button>
-          </div>
+      <Header className="app-header">
+        <div className="app-header-left">
+          <div className="brand-icon">CI</div>
+          <div style={{fontSize:14}}>Estudio Contable</div>
         </div>
 
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 12 }}>
-          <span>{user?.email}</span>
+        <div className="app-header-right">
+          <div className="app-user-email">{user?.email}</div>
+          <div className="app-avatar">{user?.email?.[0]?.toUpperCase() || 'U'}</div>
+          <Button size="small" onClick={toggleTheme} title="Cambiar tema">
+            {theme === 'dark' ? <IconToggleLight/> : <IconToggleDark/>}
+          </Button>
+          <Button size="small" type="text" className="logout-btn" onClick={logout} title="Salir">
+            <IconLogout/>
+          </Button>
         </div>
       </Header>
       <Content style={{ padding: 24 }}>

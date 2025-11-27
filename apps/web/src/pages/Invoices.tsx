@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { Table, Tag, Space, Button, Input, Select, DatePicker, message, Popconfirm, Flex, Typography } from 'antd';
 import { IconDownload, IconEye, IconEnable } from '../components/icons';
+import PdfPreviewModal from '../components/PdfPreviewModal';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { fetchInvoices, patchInvoice, ListParams, getInvoiceFileDownloadUrl } from '../features/invoices/api';
 import { InvoiceItem } from '../features/invoices/types';
@@ -56,10 +57,30 @@ export default function Invoices() {
   const downloadMutation = useMutation({
     mutationFn: (fileId: string) => getInvoiceFileDownloadUrl(fileId),
     onSuccess: (url) => {
-      window.open(url, '_blank', 'noopener,noreferrer');
+      // previously opened in new tab; now handled by preview flow in component
     },
     onError: (e: any) => message.error(e?.response?.data?.error?.message || 'Error obteniendo enlace')
   });
+
+  // PDF preview state
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewBlobUrl, setPreviewBlobUrl] = useState<string | null>(null);
+  const [previewName, setPreviewName] = useState<string | undefined>(undefined);
+
+  const openPdfPreview = async (fileId: string, filename?: string) => {
+    try {
+      const url = await getInvoiceFileDownloadUrl(fileId);
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error('Error fetching file');
+      const blob = await resp.blob();
+      const obj = URL.createObjectURL(blob);
+      setPreviewBlobUrl(obj);
+      setPreviewName(filename);
+      setPreviewOpen(true);
+    } catch (e: any) {
+      message.error(e?.message || 'No se pudo abrir vista previa');
+    }
+  };
 
   const columns: ColumnsType<InvoiceItem> = useMemo(() => {
     return [
@@ -99,15 +120,8 @@ export default function Invoices() {
         dataIndex: 'estado_arca',
         key: 'arca',
         render: (v: InvoiceItem['estado_arca']) => {
-          const color =
-            v === 'VALIDA'
-              ? 'green'
-              : v === 'INVALIDA'
-              ? 'red'
-              : v === 'PENDIENTE'
-              ? 'gold'
-              : 'default';
-          return <Tag color={color} className={v === 'PENDIENTE' ? 'tag-pending-strong' : ''}>{v}</Tag>;
+          const cls = v === 'PENDIENTE' ? 'pending' : v === 'VALIDA' ? 'ok' : (v === 'INVALIDA' || v === 'ERROR') ? 'disabled' : 'neutral';
+          return <span className={`chip chip-${cls}`}>{v}</span>;
         },
         width: 120
       },
@@ -116,7 +130,7 @@ export default function Invoices() {
         dataIndex: 'habilitada_pago',
         key: 'pago',
         render: (v: boolean) => (
-          <Tag color={v ? 'green' : 'red'} className="tag-payment-strong">{v ? 'Habilitada' : 'No habilitada'}</Tag>
+          <span className={`chip ${v ? 'chip-ok' : 'chip-disabled'}`}>{v ? 'Habilitada' : 'No habilitada'}</span>
         ),
         width: 130
       },
@@ -144,7 +158,7 @@ export default function Invoices() {
               <IconEye /> Ver
             </Button>
             {r.file && (
-              <Button size="small" onClick={() => downloadMutation.mutate(r.file!.id)} loading={downloadMutation.isPending}>
+              <Button size="small" onClick={() => openPdfPreview(r.file!.id, r.file?.original_filename)} loading={downloadMutation.isPending}>
                 <IconDownload /> Descargar
               </Button>
             )}
@@ -244,6 +258,18 @@ export default function Invoices() {
         columns={columns}
         pagination={pagination}
         scroll={{ x: 980 }}
+      />
+
+      <PdfPreviewModal
+        open={previewOpen}
+        blobUrl={previewBlobUrl}
+        fileName={previewName}
+        onClose={() => {
+          setPreviewOpen(false);
+          if (previewBlobUrl) URL.revokeObjectURL(previewBlobUrl);
+          setPreviewBlobUrl(null);
+          setPreviewName(undefined);
+        }}
       />
     </Space>
   );

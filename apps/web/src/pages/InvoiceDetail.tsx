@@ -50,13 +50,13 @@ export default function InvoiceDetail() {
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="large">
       <Space style={{ justifyContent: 'space-between', width: '100%' }}>
-        <Typography.Title level={3} style={{ margin: 0 }}>
+        <Typography.Title level={3} style={{ margin: 0, color: 'var(--text)' }}>
           Factura {inv.punto_venta}-{inv.numero}
         </Typography.Title>
         <Button onClick={() => nav(-1)}>Volver</Button>
       </Space>
 
-      <Card>
+      <Card style={{ background: 'var(--card-bg)', border: '1px solid var(--borders)', color: 'var(--text)' }}>
         <Descriptions column={3} size="small" bordered>
             <Descriptions.Item label="Fecha">
             {inv.fecha_emision}
@@ -91,24 +91,16 @@ export default function InvoiceDetail() {
                 })}`}
             </Descriptions.Item>
             <Descriptions.Item label="Estado ARCA">
-                <Tag
-                color={
-                    inv.estado_arca === 'VALIDA'
-                    ? 'green'
-                    : inv.estado_arca === 'INVALIDA'
-                    ? 'red'
-                    : inv.estado_arca === 'PENDIENTE'
-                    ? 'gold'
-                    : 'default'
+                {
+                  (() => {
+                    const v = inv.estado_arca;
+                    const cls = v === 'PENDIENTE' ? 'pending' : v === 'VALIDA' ? 'ok' : (v === 'INVALIDA' || v === 'ERROR') ? 'disabled' : 'neutral';
+                    return <span className={`chip chip-${cls}`}>{v}</span>;
+                  })()
                 }
-                >
-                {inv.estado_arca}
-                </Tag>
             </Descriptions.Item>
             <Descriptions.Item label="Pago">
-                <Tag color={inv.habilitada_pago ? 'green' : 'red'}>
-                {inv.habilitada_pago ? 'Habilitada' : 'No habilitada'}
-                </Tag>
+              <span className={`chip ${inv.habilitada_pago ? 'chip-ok' : 'chip-disabled'}`}>{inv.habilitada_pago ? 'Habilitada' : 'No habilitada'}</span>
             </Descriptions.Item>
 
             <Descriptions.Item label="CAE">
@@ -134,7 +126,7 @@ export default function InvoiceDetail() {
         </Descriptions>
       </Card>
 
-      <Card title="Observaciones">
+      <Card title="Observaciones" style={{ background: 'var(--card-bg)', border: '1px solid var(--borders)', color: 'var(--text)' }}>
         <Space direction="vertical" style={{ width: '100%' }}>
           <TextArea
             rows={4}

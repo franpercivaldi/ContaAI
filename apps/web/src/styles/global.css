@@ -159,7 +159,13 @@ body.dark{
 .app-header{
   position: relative;
   color: var(--header-text);
-  background: var(--header-bg) !important;
+  background: var(--card-bg) !important;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  border-bottom: 1px solid #2A2A2E; /* hairline */
+  box-shadow: none;
 }
 
 .app-header .header-center{
@@ -168,6 +174,29 @@ body.dark{
   top: 50%;
   transform: translate(-50%, -50%);
 }
+
+/* Header left branding and right user area */
+.app-header-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:700;
+  color: var(--header-text);
+}
+.app-header-left .brand-icon{
+  width:28px;height:28px;border-radius:6px;background:linear-gradient(180deg,var(--primary),var(--primary-hover));display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,0.12);
+}
+.app-header-right{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.app-user-email{font-size:13px;color:var(--muted);margin-right:8px}
+.app-avatar{width:36px;height:36px;border-radius:999px;background:linear-gradient(180deg,#ffffff10,#ffffff06);display:inline-flex;align-items:center;justify-content:center;color:var(--text);font-weight:600;border:1px solid rgba(255,255,255,0.04)}
+.logout-btn{transition: transform 160ms ease, color 160ms ease; border-radius:8px}
+.logout-btn:hover{transform: translateY(-3px); color: var(--danger) !important}
+
 
 /* Responsive: on narrow screens move center area to the right */
 @media (max-width: 720px){
@@ -193,6 +222,16 @@ body{
   color: var(--text) !important;
   box-shadow: var(--card-shadow);
   border: 1px solid var(--borders);
+}
+
+/* Ensure card headers (titles) follow theme colors */
+.ant-card-head{
+  background: transparent !important;
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+.ant-card-head-title{
+  color: var(--text) !important;
+  font-weight: 700;
 }
 
 /* Inputs: ensure text, placeholder and borders are visible */
@@ -277,8 +316,10 @@ body{
 }
 
 .ant-table-thead > tr > th{
-  color: var(--muted) !important;
-  font-weight: var(--fw-semibold) !important;
+  color: var(--table-header-text) !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
 }
 
 .ant-tag{
@@ -316,9 +357,9 @@ body{
   overflow: hidden;
 }
 .ant-table-thead > tr > th{
-  background: var(--table-header-bg) !important;
-  color: var(--table-header-text) !important;
-  border-bottom-color: var(--borderLight) !important;
+  background: #1F1F23 !important; /* stronger header contrast */
+  color: #D7D7DB !important;
+  border-bottom: 1px solid #2A2A2E !important;
 }
 
 /* Center all table text (headers and cells). Use !important to override inline alignments when needed. */
@@ -338,12 +379,12 @@ body{
 .ant-table-tbody > tr > td{
   background: transparent !important;
   color: var(--text) !important;
-  border-bottom-color: var(--borders) !important;
+  border-bottom: 1px solid #2A2A2E !important;
 }
 
 /* Hover row */
 .ant-table-tbody > tr:hover > td{
-  background: var(--table-row-hover) !important;
+  background: #26262B !important;
 }
 
 /* Subtle zebra striping for better row separation (dark mode subtle tones) */
@@ -352,6 +393,46 @@ body{
 }
 .ant-table-tbody > tr:nth-child(even) > td{
   background: var(--table-row-alt-bg) !important;
+}
+
+/* First column sticky to give premium feel */
+.ant-table-thead > tr > th:first-child,
+.ant-table-tbody > tr > td:first-child{
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 3 !important;
+  background: linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.00));
+  box-shadow: 6px 0 16px rgba(2,6,23,0.12);
+}
+
+/* Chips / status pills */
+.chip{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:12px;
+  border:1px solid rgba(255,255,255,0.04);
+}
+.chip-pending{
+  background: #312E1B;
+  color: #E8D08B;
+  border-color: rgba(226,208,139,0.08);
+}
+.chip-disabled{
+  background: #3A1F1F;
+  color: #F2BBBB;
+  border-color: rgba(242,187,187,0.06);
+}
+.chip-ok{
+  background: #143D32;
+  color: #67D9AE;
+  border-color: rgba(103,217,174,0.06);
+}
+.chip-neutral{
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+  border-color: rgba(255,255,255,0.03);
 }
 
 /* Make table header stand out but not too bright */
@@ -383,3 +464,36 @@ body{
 .ant-empty-description{
   color: var(--muted) !important;
 }
+
+/* Descriptions (detail view) styling to match app tokens */
+.ant-descriptions{
+  color: var(--text) !important;
+}
+.ant-descriptions-bordered .ant-descriptions-item-label{
+  color: var(--muted) !important;
+  font-weight: 600;
+  background: transparent !important;
+}
+.ant-descriptions-bordered .ant-descriptions-item-content{
+  color: var(--text) !important;
+  background: transparent !important;
+}
+
+/* PDF modal theme-aware styling */
+.pdf-modal .ant-modal-body{
+  background: var(--card-bg) !important;
+}
+.pdf-modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 16px;
+  border-bottom: 1px solid var(--borders);
+}
+.pdf-modal-header-left{display:flex;gap:12px;align-items:center}
+.pdf-modal-title{font-weight:700;color:var(--text);font-size:16px}
+.pdf-modal-sub{color:var(--muted);font-size:13px}
+.pdf-modal-controls .ant-btn{color:var(--text)}
+.pdf-modal-body{flex:1;overflow:auto;display:flex;justify-content:center;align-items:center;padding:20px}
+.pdf-modal-canvas{box-shadow:0 10px 40px rgba(2,6,23,0.12);border-radius:8px}
+.pdf-modal-loading{color:var(--muted)}
