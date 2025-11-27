@@ -1,0 +1,147 @@
+/* Auth screen: two-column layout with hero on the left and form card on the right */
+.auth-page{
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.auth-left{
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* overlay with gradient for better legibility */
+.auth-left::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.65),
+    rgba(0,0,0,0.25)
+  );
+  pointer-events: none;
+}
+
+.auth-left .hero{
+  position: relative;
+  z-index: 2;
+  color: var(--text);
+  text-align: left;
+  padding: 64px;
+  max-width: 520px;
+}
+.auth-left .hero h1{
+  font-size: 44px;
+  margin: 0 0 8px 0;
+  color: #fff;
+  font-weight: 800;
+}
+.auth-left .hero p{
+  color: rgba(255,255,255,0.88);
+  margin: 6px 0;
+  font-size: 16px;
+}
+
+.auth-right{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  background: var(--bg);
+  position: relative;
+}
+
+.auth-card{
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+  background: var(--card-bg) !important;
+  border: 1px solid var(--borders) !important;
+  box-shadow: 0 24px 60px rgba(15,23,42,0.18) !important;
+  padding: 32px !important;
+}
+
+.auth-card h2{
+  margin: 0 0 6px 0;
+  font-size: 24px;
+  color: var(--text);
+  font-weight: 700;
+}
+.auth-card .auth-subtitle{
+  margin: 0 0 18px 0;
+  color: var(--muted);
+}
+
+.auth-card .ant-form-item-label > label{
+  color: var(--muted) !important;
+}
+
+.auth-footer-link{
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+/* Brand logo in the card area */
+.auth-brand{
+  position: absolute;
+  left: 24px;
+  top: 20px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.auth-brand .logo-icon{
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+}
+.auth-brand .logo-text{
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Buttons and links branding */
+.auth-card .ant-btn-primary{
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
+  transition: all 0.15s ease-out;
+}
+.auth-card .ant-btn-primary:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(0,166,126,0.25);
+}
+.auth-card a:hover{
+  color: var(--primary) !important;
+}
+
+/* Input focus ring using primary */
+.auth-card .ant-input:focus,
+.auth-card .ant-input-affix-wrapper-focused,
+.auth-card .ant-select-focused .ant-select-selector{
+  border-color: var(--input-border-focus) !important;
+  box-shadow: 0 0 0 6px rgba(0,166,126,0.08) !important;
+}
+
+/* Softer placeholders */
+.auth-card .ant-input::placeholder, .auth-card .ant-input-affix-wrapper .ant-input::placeholder{
+  color: rgba(255,255,255,0.6) !important;
+}
+
+@media (max-width: 900px){
+  .auth-page{ grid-template-columns: 1fr; }
+  .auth-left{ display:none; }
+  .auth-right{ padding: 24px; }
+  .auth-card{ max-width: 100%; }
+}
