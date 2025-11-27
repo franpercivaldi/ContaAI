@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directUrl         = env("DATABASE_URL") // opcional (Neon), si no la tenés, podés borrar esta línea
+  relationMode      = "foreignKeys"
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  role          Role     @default(USER)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  AuditLogs     AuditLog[]
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model Invoice {
+  id             String     @id @default(uuid())
+  hash           String     @unique
+  supplierCuit   String
+  customerCuit   String
+  puntoVenta     Int
+  numero         BigInt
+  cae            String?
+  fechaEmision   DateTime
+  moneda         String     @default("ARS")
+  montoTotal     Decimal    @db.Decimal(18, 2)
+  estadoArca     EstadoArca @default(PENDIENTE)
+  habilitadaPago Boolean    @default(false)
+  observaciones  String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  // 🔽 nuevos campos “reales”
+  tipoFactura    String?    // A, B, C, etc
+  montoIva       Decimal?   @db.Decimal(18, 2)
+  razonSocial    String?
+  condicionIva   String?
+
+  files          InvoiceFile[]
+}
+
+
+enum EstadoArca {
+  VALIDA
+  INVALIDA
+  PENDIENTE
+  ERROR
+}
+
+model InvoiceFile {
+  id               String   @id @default(uuid())
+  invoiceId        String
+  s3Key            String
+  originalFilename String
+  mime             String
+  size             BigInt
+  sha256           String
+  createdAt        DateTime @default(now())
+
+  invoice          Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+
+model WebhookEvent {
+  id           String   @id @default(uuid())
+  invoiceHash  String
+  status       WebhookStatus
+  payloadJson  Json
+  errorMsg     String?
+  createdAt    DateTime @default(now())
+
+  @@index([invoiceHash])
+}
+
+enum WebhookStatus {
+  RECEIVED
+  PROCESSED
+  SKIPPED
+  FAILED
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String
+  metaJson  Json?
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id])
+}

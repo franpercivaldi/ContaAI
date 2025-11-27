@@ -1,0 +1,54 @@
+### Node.js / pnpm / monorepo ###
+node_modules/
+**/node_modules/
+.pnpm/
+.pnpm-store/
+.pnp/
+.pnp.js
+
+# Lockfiles (keep pnpm-lock if you want, ignore others)
+package-lock.json
+yarn.lock
+
+### Build / cache ###
+dist/
+build/
+.vite/
+.cache/
+*.tsbuildinfo
+
+### Env files ###
+.env
+.env.*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+### Logs ###
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+### Coverage ###
+coverage/
+.nyc_output/
+
+### IDEs / system files ###
+.DS_Store
+.vscode/
+.idea/
+Thumbs.db
+
+### Test / temp ###
+jest-cache/
+tmp/
+temp/
+
+### Misc ###
+*.tgz
+*.zip
+*.bak
+*.swp

@@ -1,0 +1,385 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* Minimalista y moderno para botones */
+:root{
+  /* Typography */
+  --font-family-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --btn-radius: 10px;
+  --btn-padding-vertical: 8px;
+  --btn-padding-horizontal: 14px;
+
+  /* Core tokens */
+  --bg: #FAFAFA;
+  --card-bg: #FFFFFF;
+  --text: #0F172A;
+  --muted: #6B6B6B;
+  --borders: #D0D0D0;
+  --btn-border: rgba(16,24,40,0.06);
+  --header-bg: linear-gradient(90deg,#FFFFFF,#F8FAFC);
+  --header-text: #0F172A;
+  --card-shadow: 0 6px 18px rgba(2,6,23,0.04);
+
+  /* Inputs */
+  --input-bg: #FFFFFF;
+  --input-border: #D0D0D0;
+
+  /* Primary accent (green) */
+  --primary: #00A67E;
+  --primary-hover: #0EBE8C;
+  --primary-illuminated: #2AD4A1;
+  --primary-dark: #003E2F;
+  --primary-gradient-start: var(--primary);
+  --primary-gradient-end: var(--primary-hover);
+
+  /* Table background (light by default) */
+  --table-bg: #FFFFFF;
+  --table-header-bg: #F7F7F8;
+  --table-header-text: #263244;
+  --table-row-hover: #F3F4F6;
+  --table-row-bg: rgba(255,255,255,0.02);
+  --table-row-alt-bg: rgba(255,255,255,0.03);
+
+  /* Optional accents */
+  --info: #3A88F2;
+  --purple: #8B5CF6;
+  --warning: #FFB545;
+  --danger: #EF4444;
+}
+
+/* (Light theme tokens merged into the main :root above) */
+
+/* Dark theme tokens (applied when body.dark) - adjusted to be less black */
+body.dark{
+  --bg: #0D0D0F;           /* Background (requested) */
+  --card-bg: #161618;      /* Card principal (requested) */
+  --borders: #2A2A2E;      /* Card border (requested) */
+  --card-shadow: 0 8px 24px rgba(2,6,23,0.45); /* suave shadow for dark */
+  --text: #F3F3F4;         /* Texto principal */
+  --muted: #A1A1A5;        /* Texto secundario */
+  --header-bg: #181818;    /* Header color requested */
+  --header-text: #F3F3F4;
+
+  --input-bg: #1E1E22;     /* Inputs match card hierarchy */
+  --input-border: #2A2A2E;
+
+  --primary: #00A67E;
+  --primary-hover: #0EBE8C;
+  --primary-illuminated: #2AD4A1;
+  --primary-dark: #003E2F;
+  --primary-gradient-start: var(--primary);
+  --primary-gradient-end: var(--primary-hover);
+
+  /* Table background for dark theme per request */
+  --table-bg: #303030;
+  --table-header-bg: #1C1C1F; /* header requested */
+  --table-header-text: #D7D7DB; /* header text */
+  --table-row-hover: #26262B; /* hover row */
+  --table-row-bg: rgba(255,255,255,0.01);
+  --table-row-alt-bg: rgba(255,255,255,0.02);
+
+  --btn-border: rgba(255,255,255,0.06);
+
+  --info: #3A88F2;
+  --purple: #8B5CF6;
+  --warning: #FFB545;
+  --danger: #EF4444;
+}
+
+/* Estilo base para ant buttons: limpio, sin sombras pesadas */
+.ant-btn{
+  border-radius: var(--btn-radius) !important;
+  padding: var(--btn-padding-vertical) var(--btn-padding-horizontal) !important;
+  border: 1px solid var(--btn-border) !important;
+  background: transparent !important;
+  color: var(--text) !important;
+  font-weight: var(--fw-semibold) !important;
+  box-shadow: none !important;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, color 120ms ease, border-color 120ms ease;
+  font-size: 14px;
+  padding: 10px 16px !important;
+}
+
+.ant-btn:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(2,6,23,0.08);
+}
+
+.ant-btn:focus{
+  box-shadow: 0 0 0 6px rgba(0,166,126,0.12);
+}
+
+/* Primary button: gradient, white text */
+.ant-btn-primary{
+  background: transparent !important;
+  border: 1px solid var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+.ant-btn-primary:hover{
+  background: linear-gradient(90deg,var(--primary-gradient-start),var(--primary-gradient-end)) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+
+.ant-btn > svg, .ant-btn .anticon{
+  margin-right: 8px;
+  vertical-align: -2px;
+}
+
+/* Ghost/outline variant for secondary actions */
+.ant-btn-ghost, .ant-btn[aria-role="ghost"]{
+  background: rgba(255,255,255,0.04) !important;
+}
+
+/* Small size tweaks */
+.ant-btn-small{
+  padding: 6px 10px !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+
+/* Utility: center a group of buttons horizontally */
+.center-buttons{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  align-items:center;
+}
+
+/* Vertical variant: stack buttons one below the other */
+.center-buttons.vertical{
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* Header tweak: ensure centered area can overlap naturally */
+.app-header{
+  position: relative;
+  color: var(--header-text);
+  background: var(--header-bg) !important;
+}
+
+.app-header .header-center{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Responsive: on narrow screens move center area to the right */
+@media (max-width: 720px){
+  .app-header .header-center{
+    position: static;
+    transform: none;
+    margin-left: auto;
+  }
+}
+
+/* Aplicar background y colores base usando tokens */
+body{
+  background: var(--bg);
+  color: var(--text);
+}
+
+.ant-layout-header{
+  background: var(--header-bg) !important;
+}
+
+.ant-card{
+  background: var(--card-bg) !important;
+  color: var(--text) !important;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--borders);
+}
+
+/* Inputs: ensure text, placeholder and borders are visible */
+.ant-input, .ant-select-selector, .ant-input-affix-wrapper, .ant-picker{
+  background: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  color: var(--text) !important;
+}
+.ant-input::placeholder, .ant-input-affix-wrapper .ant-input::placeholder{
+  color: var(--muted) !important;
+  opacity: 1;
+}
+.ant-input:focus, .ant-input-affix-wrapper-focused, .ant-select-focused .ant-select-selector{
+  border-color: var(--input-border-focus) !important;
+  box-shadow: 0 0 0 4px rgba(0,166,126,0.08); /* subtle focus */
+}
+
+/* DatePicker / RangePicker input specifics */
+.ant-picker, .ant-picker-input input, .ant-picker .ant-input {
+  background: var(--input-bg) !important;
+  color: var(--text) !important;
+}
+.ant-picker-input input::placeholder, .ant-picker .ant-input::placeholder{
+  color: var(--muted) !important;
+  opacity: 1;
+}
+.ant-picker .ant-input:focus{
+  border-color: var(--input-border-focus) !important;
+  box-shadow: 0 0 0 4px rgba(0,166,126,0.08);
+}
+
+/* Page container for content in light mode: centered, bordered white card */
+.app-container{
+  min-width: 98%;
+  margin: 24px auto;
+  background: var(--card-bg) !important;
+  border: 1px solid var(--borders);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  /* max height similar to the 98% width behavior */
+  max-height: 78vh;
+}
+
+/* Ensure full-width components inside container behave */
+.app-container .ant-table-wrapper,
+.app-container .ant-card,
+.app-container .ant-form{
+  background: transparent !important;
+}
+
+/* Content area inside the container that scrolls when content overflows */
+.app-content{
+  flex: 1 1 auto;
+  overflow: auto;
+  min-height: 0; /* allow flex children to shrink */
+}
+
+/* Make table take available space inside app-content and keep pagination sticky */
+.app-content .ant-table-wrapper{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.app-content .ant-table-body{
+  overflow: auto;
+}
+
+.app-content .ant-pagination{
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(0deg, transparent, var(--card-bg));
+  padding-top: 8px;
+}
+
+/* Smooth transition between themes */
+*{
+  transition: background-color 220ms ease, color 220ms ease, border-color 180ms ease;
+}
+
+.ant-table-thead > tr > th{
+  color: var(--muted) !important;
+  font-weight: var(--fw-semibold) !important;
+}
+
+.ant-tag{
+  font-weight: 600;
+}
+
+/* Stronger variants for specific tags */
+.ant-tag.tag-pending-strong,
+.ant-tag.tag-payment-strong{
+  font-weight: 700 !important;
+  font-size: 13px;
+  padding: 4px 10px !important;
+}
+
+.ant-btn-primary:active, .ant-btn-primary:focus{
+  transform: translateY(-1px) !important;
+}
+
+/* Make layout and content adopt theme tokens */
+.ant-layout{
+  background: transparent !important;
+}
+
+.ant-layout-content{
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+/* Tables */
+.ant-table-wrapper, .ant-table{
+  /* keep table background transparent to let card surface show through */
+  background: transparent !important;
+  color: var(--text) !important;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.ant-table-thead > tr > th{
+  background: var(--table-header-bg) !important;
+  color: var(--table-header-text) !important;
+  border-bottom-color: var(--borderLight) !important;
+}
+
+/* Center all table text (headers and cells). Use !important to override inline alignments when needed. */
+.ant-table-thead th,
+.ant-table-tbody td,
+.ant-table-thead th .ant-table-column-sorters,
+.ant-table-cell{
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* If you want numeric columns to remain right-aligned, add a class to those columns and override here. */
+.ant-table-cell.align-right, .ant-table-column-align-right{
+  text-align: right !important;
+}
+
+.ant-table-tbody > tr > td{
+  background: transparent !important;
+  color: var(--text) !important;
+  border-bottom-color: var(--borders) !important;
+}
+
+/* Hover row */
+.ant-table-tbody > tr:hover > td{
+  background: var(--table-row-hover) !important;
+}
+
+/* Subtle zebra striping for better row separation (dark mode subtle tones) */
+.ant-table-tbody > tr:nth-child(odd) > td{
+  background: var(--table-row-bg) !important;
+}
+.ant-table-tbody > tr:nth-child(even) > td{
+  background: var(--table-row-alt-bg) !important;
+}
+
+/* Make table header stand out but not too bright */
+.ant-table-thead > tr > th{
+  background: var(--table-header-bg) !important;
+  color: var(--table-header-text) !important;
+  border-bottom-color: var(--borderLight) !important;
+}
+
+/* Pagination and controls */
+.ant-pagination, .ant-pagination .ant-pagination-item-link, .ant-pagination .ant-pagination-next, .ant-pagination .ant-pagination-prev{
+  color: var(--muted) !important;
+}
+
+/* Form controls */
+.ant-input, .ant-select-selector, .ant-picker, .ant-input-affix-wrapper{
+  background: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  color: var(--text) !important;
+}
+
+/* Popconfirm/Popover */
+.ant-popover, .ant-popover-inner, .ant-popover-inner-content, .ant-popover-title{
+  background: var(--card-bg) !important;
+  color: var(--text) !important;
+}
+
+/* Table empty text */
+.ant-empty-description{
+  color: var(--muted) !important;
+}

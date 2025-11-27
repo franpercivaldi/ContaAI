@@ -1,0 +1,64 @@
+:root{
+  /* Backgrounds */
+  --color-bg-base: #0D0D0F;
+  --color-bg-card: #161618;
+  --color-bg-secondary: #1F1F23;
+
+  /* Text */
+  --color-text-primary: #F3F3F4;
+  --color-text-secondary: #A1A1A5;
+  --color-text-muted: #6C6C70;
+
+  /* Borders / dividers */
+  --color-border: #2A2A2E;
+  --color-border-light: #37373C;
+
+  /* Primary */
+  --color-primary: #00A67E;
+  --color-primary-hover: #0EBE8C;
+  --color-primary-active: #067E62;
+
+  /* Tags / status */
+  --color-tag-pending-bg: #FFE8A3;
+  --color-tag-pending-text: #7A5B00;
+  --color-tag-error-bg: #F8C7C7;
+  --color-tag-error-text: #7C1F1F;
+  --color-tag-success-bg: #C2F3DF;
+  --color-tag-success-text: #115F45;
+
+  /* Inputs */
+  --color-input-bg: #1E1E22;
+  --color-input-border: #2A2A2E;
+  --color-input-border-hover: #3A3A41;
+  --color-input-border-focus: #00A67E;
+
+  /* Links */
+  --color-link: #3A88F2;
+  --color-link-hover: #5AA2FF;
+}
+
+/* Utility: apply base background and text */
+body{
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
+}
+
+/* Example usage for cards */
+.card{
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+/* Inputs example */
+.input{
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  color: var(--color-text-primary);
+}
+.input:hover{ border-color: var(--color-input-border-hover); }
+.input:focus{ outline: none; box-shadow: 0 0 0 4px rgba(0,166,126,0.12); border-color: var(--color-input-border-focus); }
+
+/* Links */
+a{ color: var(--color-link); }
+a:hover{ color: var(--color-link-hover); }

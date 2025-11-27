@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: contable
+    ports:
+      - '5432:5432'
+
+  minio:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    ports:
+      - '9000:9000'
+
+  api:
+    build: ../../
+    image: contable-api
+    depends_on:
+      - postgres
+      - minio
+    ports:
+      - '4000:4000'
+
+  web:
+    image: node:18
+    working_dir: /app
+    volumes:
+      - ../../apps/web:/app
+    command: sh -c "pnpm install && pnpm dev"
+    ports:
+      - '5173:5173'
+
+  n8n:
+    image: n8nio/n8n
+    ports:
+      - '5678:5678'
+
+  redis:
+    image: redis:7
+    ports:
+      - '6379:6379'
