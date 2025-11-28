@@ -12,6 +12,12 @@
 
   /* Core tokens */
   --bg: #FAFAFA;
+  --bg-light: #FAFAFA;
+  --bg-dark: #0D0D0F;
+  --theme-transition: 1000ms;
+  --theme-ease: cubic-bezier(.2,.8,.2,1);
+  --bg-light: #FAFAFA;
+  --bg-dark: #0D0D0F;
   --card-bg: #FFFFFF;
   --text: #0F172A;
   --muted: #6B6B6B;
@@ -208,10 +214,34 @@ body.dark{
 }
 
 /* Aplicar background y colores base usando tokens */
+/* Use pseudo-elements to cross-fade the page background between light and dark
+   for a much smoother visual transition (interpolates via opacity instead of
+   directly swapping a single background color). */
 body{
-  background: var(--bg);
+  background: transparent;
   color: var(--text);
+  position: relative;
+  min-height: 100vh;
 }
+
+/* The two layers: light (before) and dark (after). We toggle their opacity
+   via the `body.dark` class to create a smooth crossfade. */
+body::before,
+body::after{
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity var(--theme-transition) var(--theme-ease), background-color var(--theme-transition) ease, filter var(--theme-transition) var(--theme-ease), transform var(--theme-transition) var(--theme-ease);
+  transform-origin: center center;
+}
+body::before{ background: var(--bg-light); opacity: 1; filter: blur(0px); transform: scale(1); }
+body::after{ background: var(--bg-dark); opacity: 0; filter: blur(2px); transform: scale(1.01); }
+
+/* When dark mode is active, reverse the opacities and subtle blur/scale for a softer crossfade */
+body.dark::before{ opacity: 0; filter: blur(2px); transform: scale(0.99); }
+body.dark::after{ opacity: 1; filter: blur(0px); transform: scale(1); }
 
 .ant-layout-header{
   background: var(--header-bg) !important;
@@ -222,6 +252,7 @@ body{
   color: var(--text) !important;
   box-shadow: var(--card-shadow);
   border: 1px solid var(--borders);
+  transition: background-color 300ms cubic-bezier(.2,.9,.2,1), box-shadow 300ms cubic-bezier(.2,.9,.2,1), border-color 220ms ease, transform 180ms ease;
 }
 
 /* Ensure card headers (titles) follow theme colors */
@@ -311,8 +342,30 @@ body{
 }
 
 /* Smooth transition between themes */
+/* Smooth transition between themes */
 *{
-  transition: background-color 220ms ease, color 220ms ease, border-color 180ms ease;
+  transition: background-color 220ms ease, color 220ms ease, border-color 180ms ease, box-shadow 220ms ease, transform 180ms ease;
+}
+
+/* Body background transition for a noticeable yet smooth theme change */
+body{
+  transition: background 320ms ease, color 220ms ease;
+}
+
+/* Animate Ant switch (theme toggle) for a livelier feel */
+.ant-switch{
+  transition: background-color 240ms cubic-bezier(.2,.9,.2,1), border-color 220ms ease, box-shadow 220ms ease;
+}
+.ant-switch .ant-switch-handle{
+  transition: transform 220ms cubic-bezier(.2,.9,.2,1), box-shadow 220ms ease, background-color 180ms ease;
+}
+.ant-switch-checked{
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *{transition: none !important}
 }
 
 .ant-table-thead > tr > th{
