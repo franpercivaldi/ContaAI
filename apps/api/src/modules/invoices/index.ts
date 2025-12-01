@@ -130,6 +130,7 @@ export default async function invoicesRoutes(app: FastifyInstance) {
         monto_total: inv.montoTotal.toNumber(),
         estado_arca: inv.estadoArca,
         habilitada_pago: inv.habilitadaPago,
+        paid: inv.paid,
         observaciones: inv.observaciones ?? null,
         file: inv.files[0]
             ? {
@@ -192,6 +193,7 @@ export default async function invoicesRoutes(app: FastifyInstance) {
         monto_total: inv.montoTotal.toNumber(),
         estado_arca: inv.estadoArca,
         habilitada_pago: inv.habilitadaPago,
+        paid: inv.paid,
         observaciones: inv.observaciones ?? null,
         files: inv.files.map((f) => ({
             id: f.id,
@@ -203,6 +205,52 @@ export default async function invoicesRoutes(app: FastifyInstance) {
         })),
         created_at: inv.createdAt.toISOString(),
         updated_at: inv.updatedAt.toISOString(),
+    });
+  });
+
+  // PATCH /invoices/:id/paid  -> allow users (and admins) to mark invoice as paid/unpaid
+  const PaidBodySchema = z.object({ paid: z.boolean() });
+  app.patch('/:id/paid', { preHandler: [app.authenticate, requireRole('USER')] }, async (req, reply) => {
+    const idParse = IdParamSchema.safeParse(req.params);
+    if (!idParse.success) return reply.badRequest('Invalid id', idParse.error.format());
+    const bodyParse = PaidBodySchema.safeParse(req.body);
+    if (!bodyParse.success) return reply.badRequest('Invalid body', bodyParse.error.format());
+
+    const { id } = idParse.data;
+    const { paid } = bodyParse.data;
+
+    const inv = await prisma.invoice.update({
+      where: { id },
+      data: { paid },
+      include: { files: { orderBy: { createdAt: 'desc' }, take: 1 } }
+    });
+
+    return reply.send({
+      id: inv.id,
+      hash: inv.hash,
+      supplier_cuit: inv.supplierCuit,
+      customer_cuit: inv.customerCuit,
+      punto_venta: inv.puntoVenta,
+      numero: inv.numero.toString(),
+      cae: inv.cae ?? null,
+      fecha_emision: inv.fechaEmision.toISOString().slice(0, 10),
+      moneda: inv.moneda,
+      monto_total: inv.montoTotal.toNumber(),
+      estado_arca: inv.estadoArca,
+      habilitada_pago: inv.habilitadaPago,
+      paid: inv.paid,
+      observaciones: inv.observaciones ?? null,
+      file: inv.files[0]
+        ? {
+            id: inv.files[0].id,
+            s3_key: inv.files[0].s3Key,
+            mime: inv.files[0].mime,
+            size: Number(inv.files[0].size),
+            original_filename: inv.files[0].originalFilename,
+          }
+        : null,
+      created_at: inv.createdAt.toISOString(),
+      updated_at: inv.updatedAt.toISOString(),
     });
   });
 
@@ -242,6 +290,7 @@ export default async function invoicesRoutes(app: FastifyInstance) {
       monto_total: inv.montoTotal.toNumber(),
       estado_arca: inv.estadoArca,
       habilitada_pago: inv.habilitadaPago,
+      paid: inv.paid,
       observaciones: inv.observaciones ?? null,
       file: inv.files[0]
         ? {
