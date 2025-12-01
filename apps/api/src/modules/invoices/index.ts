@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { prisma } from '../../core/db.js';
-import { EstadoArca } from '@prisma/client';
+import { EstadoArca, Organization } from '@prisma/client';
 import { requireRole } from '../../core/auth.js';
 
 
@@ -22,6 +22,7 @@ const ListQuerySchema = z.object({
     .enum(['fecha_emision', 'monto_total', 'created_at'])
     .default('fecha_emision'),
   sortDir: z.enum(['asc', 'desc']).default('desc'),
+  organization: z.nativeEnum(Organization).optional(),
 });
 
 // 2) Mapeo de sort keys a campos reales de Prisma
@@ -50,7 +51,7 @@ export default async function invoicesRoutes(app: FastifyInstance) {
     }
     const {
       page, pageSize, q, estado_arca, habilitada_pago,
-      supplier_cuit, dateFrom, dateTo, sortBy, sortDir
+      supplier_cuit, dateFrom, dateTo, sortBy, sortDir, organization
     } = parse.data;
 
     // Construimos el "where" en función de filtros
@@ -61,6 +62,9 @@ export default async function invoicesRoutes(app: FastifyInstance) {
     }
     if (estado_arca) {
       where.estadoArca = estado_arca;
+    }
+    if (organization) {
+      where.organization = organization;
     }
     if (typeof habilitada_pago === 'boolean') {
       where.habilitadaPago = habilitada_pago;
@@ -132,6 +136,7 @@ export default async function invoicesRoutes(app: FastifyInstance) {
         habilitada_pago: inv.habilitadaPago,
         paid: inv.paid,
         observaciones: inv.observaciones ?? null,
+        organization: inv.organization,
         file: inv.files[0]
             ? {
                 id: inv.files[0].id,
@@ -195,6 +200,7 @@ export default async function invoicesRoutes(app: FastifyInstance) {
         habilitada_pago: inv.habilitadaPago,
         paid: inv.paid,
         observaciones: inv.observaciones ?? null,
+        organization: inv.organization,
         files: inv.files.map((f) => ({
             id: f.id,
             s3_key: f.s3Key,

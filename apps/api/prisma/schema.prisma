@@ -38,6 +38,7 @@ model Invoice {
   estadoArca     EstadoArca @default(PENDIENTE)
   habilitadaPago Boolean    @default(false)
   paid           Boolean    @default(false)
+  organization   Organization @default(DESCONOCIDA)
   observaciones  String?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
@@ -57,6 +58,13 @@ enum EstadoArca {
   INVALIDA
   PENDIENTE
   ERROR
+}
+
+enum Organization {
+  OBRA_SOCIAL
+  AOITA
+  MUTUAL
+  DESCONOCIDA
 }
 
 model InvoiceFile {

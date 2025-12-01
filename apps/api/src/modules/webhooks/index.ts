@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { prisma } from '../../core/db.js';
 import { parseInvoicePdfFromS3 } from '../../core/pdf.js';
+import { mapCuitToOrganization } from '../../core/organization.js';
 import { extractInvoiceWithLlm } from '../../core/llm-invoice.js';
 
 const WebhookInvoiceSchema = z.object({
@@ -46,6 +47,8 @@ export default async function webhooksRoutes(app: FastifyInstance) {
 
     // 1️⃣ Primer paso: asegurar existencia mínima de la invoice (sin usar campos del webhook)
     // Los datos de la invoice se completarán únicamente con lo que devuelva el LLM.
+    const initialOrg = mapCuitToOrganization(payload.customer_cuit ?? undefined);
+
     const invoice = await prisma.invoice.upsert({
       where: { hash: payload.hash },
       update: {},
@@ -61,6 +64,7 @@ export default async function webhooksRoutes(app: FastifyInstance) {
         montoTotal: 0,
         estadoArca: 'PENDIENTE',
         habilitadaPago: false,
+        organization: initialOrg,
         observaciones: null,
         tipoFactura: null,
         montoIva: null,
@@ -119,8 +123,13 @@ export default async function webhooksRoutes(app: FastifyInstance) {
 
           if (llm.razon_social_cliente) updateData.razonSocial = llm.razon_social_cliente;
 
-          if (llm.cuit_emisor) updateData.supplierCuit = llm.cuit_emisor;
-          if (llm.cuit_cliente) updateData.customerCuit = llm.cuit_cliente;
+          // NOTE: LLM fields `cuit_emisor` and `cuit_cliente` were observed swapped.
+          // Assign supplier/customer accordingly (swap) so the customerCuit maps to organization.
+          if (llm.cuit_cliente) updateData.supplierCuit = llm.cuit_cliente;
+          if (llm.cuit_emisor) {
+            updateData.customerCuit = llm.cuit_emisor;
+            updateData.organization = mapCuitToOrganization(llm.cuit_emisor);
+          }
 
           if (llm.fecha_emision) {
             updateData.fechaEmision = new Date(`${llm.fecha_emision}T00:00:00.000Z`);
