@@ -38,11 +38,6 @@ export default function InvoiceDetail() {
     onError: (e: any) => message.error(e?.response?.data?.error?.message || 'Error obteniendo enlace'),
   });
 
-  if (!id) return <div>Sin ID</div>;
-  if (isLoading || !data) return <div>Cargando...</div>;
-
-  const inv = data;
-
   const togglePaidMutation = useMutation({
     mutationFn: (next: boolean) => patchInvoicePaid(id!, next),
     onSuccess: (updated) => {
@@ -52,6 +47,12 @@ export default function InvoiceDetail() {
     },
     onError: (e: any) => message.error(e?.response?.data?.error?.message || 'Error actualizando')
   });
+
+  if (!id) return <div>Sin ID</div>;
+  if (isLoading || !data) return <div>Cargando...</div>;
+
+  const inv = data;
+
 
   const handleSaveObs = () => {
     obsMutation.mutate(inv.observaciones ?? '');
