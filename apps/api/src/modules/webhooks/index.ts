@@ -121,7 +121,12 @@ export default async function webhooksRoutes(app: FastifyInstance) {
           }
           if (llm.condicion_iva) updateData.condicionIva = llm.condicion_iva;
 
-          if (llm.razon_social_cliente) updateData.razonSocial = llm.razon_social_cliente;
+          // Prefer the emitter's (emisor) razon social; fallback to cliente if missing
+          if (llm.razon_social_emisor) {
+            updateData.razonSocial = llm.razon_social_emisor;
+          } else if (llm.razon_social_cliente) {
+            updateData.razonSocial = llm.razon_social_cliente;
+          }
 
           // NOTE: LLM fields `cuit_emisor` and `cuit_cliente` were observed swapped.
           // Assign supplier/customer accordingly (swap) so the customerCuit maps to organization.

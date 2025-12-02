@@ -132,16 +132,6 @@ export default function Invoices() {
       },
 
       {
-        title: 'ARCA',
-        dataIndex: 'estado_arca',
-        key: 'arca',
-        render: (v: InvoiceItem['estado_arca']) => {
-          const cls = v === 'PENDIENTE' ? 'pending' : v === 'VALIDA' ? 'ok' : (v === 'INVALIDA' || v === 'ERROR') ? 'disabled' : 'neutral';
-          return <span className={`chip chip-${cls}`}>{v}</span>;
-        },
-        width: 120
-      },
-      {
         title: 'Pago',
         dataIndex: 'habilitada_pago',
         key: 'pago',
@@ -158,19 +148,6 @@ export default function Invoices() {
           <span className={`chip ${v ? 'chip-ok' : 'chip-disabled'}`}>{v ? 'Sí' : 'No'}</span>
         ),
         width: 110
-      },
-      {
-        title: 'Archivo',
-        key: 'file',
-        width: 220,
-        render: (_, r) =>
-          r.file ? (
-            <div style={{ maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              <span title={r.file.original_filename}>{r.file.original_filename}</span>
-            </div>
-          ) : (
-            '—'
-          )
       },
       {
         title: 'Acciones',

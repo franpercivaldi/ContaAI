@@ -532,6 +532,15 @@ body{
   background: transparent !important;
 }
 
+/* Tabs styling: ensure labels use theme colors (inactive = muted, active = text) */
+.ant-tabs .ant-tabs-nav .ant-tabs-tab .ant-tabs-tab-btn{
+  color: var(--muted) !important;
+}
+.ant-tabs .ant-tabs-nav .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn{
+  color: var(--text) !important;
+  font-weight: 700;
+}
+
 /* PDF modal theme-aware styling */
 .pdf-modal .ant-modal-body{
   background: var(--card-bg) !important;
