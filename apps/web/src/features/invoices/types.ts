@@ -1,3 +1,5 @@
+import { Organization } from '../../../../packages/shared-types/src';
+
 export type InvoiceItem = {
   id: string;
   hash: string;
@@ -18,6 +20,8 @@ export type InvoiceItem = {
   monto_total: number;
   estado_arca: 'VALIDA' | 'INVALIDA' | 'PENDIENTE' | 'ERROR';
   habilitada_pago: boolean;
+  paid: boolean;
+  organization: Organization;
   observaciones: string | null;
   file: {
     id: string;

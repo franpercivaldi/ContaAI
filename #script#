@@ -1,1 +1,1 @@
-pnpm --filter @contable/web dev
+cd /home/franpercivaldi/personalProyects/contable-monorepo/apps/api && pnpm exec prisma migrate status && pnpm exec prisma db execute --sql "SELECT column_name FROM information_schema.columns WHERE table_schema='public' AND table_name='\"Invoice\"' AND column_name IN ('paid','organization');" && pnpm exec prisma db execute --sql "SELECT id, migration_name, finished_at FROM \"_prisma_migrations\" ORDER BY finished_at DESC LIMIT 20;"

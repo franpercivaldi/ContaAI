@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, Descriptions, Tag, Space, Button, Typography, Input, message } from 'antd';
-import { getInvoiceById, patchInvoice, getInvoiceFileDownloadUrl } from '../features/invoices/api';
+import { getInvoiceById, patchInvoice, patchInvoicePaid, getInvoiceFileDownloadUrl } from '../features/invoices/api';
 import { getUser } from '../lib/auth';
 import type { InvoiceItem } from '../features/invoices/types';
 
@@ -42,6 +42,16 @@ export default function InvoiceDetail() {
   if (isLoading || !data) return <div>Cargando...</div>;
 
   const inv = data;
+
+  const togglePaidMutation = useMutation({
+    mutationFn: (next: boolean) => patchInvoicePaid(id!, next),
+    onSuccess: (updated) => {
+      message.success('Actualizado');
+      qc.setQueryData<InvoiceItem>(['invoice', id], updated);
+      qc.invalidateQueries({ queryKey: ['invoices'] });
+    },
+    onError: (e: any) => message.error(e?.response?.data?.error?.message || 'Error actualizando')
+  });
 
   const handleSaveObs = () => {
     obsMutation.mutate(inv.observaciones ?? '');
@@ -100,7 +110,10 @@ export default function InvoiceDetail() {
                 }
             </Descriptions.Item>
             <Descriptions.Item label="Pago">
-              <span className={`chip ${inv.habilitada_pago ? 'chip-ok' : 'chip-disabled'}`}>{inv.habilitada_pago ? 'Habilitada' : 'No habilitada'}</span>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <span className={`chip ${inv.habilitada_pago ? 'chip-ok' : 'chip-disabled'}`}>{inv.habilitada_pago ? 'Habilitada' : 'No habilitada'}</span>
+                <span className={`chip ${inv.paid ? 'chip-ok' : 'chip-disabled'}`}>{inv.paid ? 'Pagada' : 'No pagada'}</span>
+              </div>
             </Descriptions.Item>
 
             <Descriptions.Item label="CAE">
@@ -147,6 +160,14 @@ export default function InvoiceDetail() {
               loading={obsMutation.isPending}
             >
               Guardar
+            </Button>
+          )}
+          {!isAdmin && (
+            <Button
+              onClick={() => togglePaidMutation.mutate(!inv.paid)}
+              loading={togglePaidMutation.isPending}
+            >
+              {inv.paid ? 'Marcar como NO pagada' : 'Marcar como pagada'}
             </Button>
           )}
           {!isAdmin && (

@@ -67,6 +67,14 @@ enum Organization {
   DESCONOCIDA
 }
 
+model OrganizationBudget {
+  id            String       @id @default(uuid())
+  organization  Organization @unique
+  initialAmount Decimal      @db.Decimal(18, 2) @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
 model InvoiceFile {
   id               String   @id @default(uuid())
   invoiceId        String

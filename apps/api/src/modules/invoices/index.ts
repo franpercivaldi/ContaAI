@@ -43,6 +43,78 @@ const PatchBodySchema = z.object({
 });
 
 export default async function invoicesRoutes(app: FastifyInstance) {
+  // GET /invoices/summary?organization=AOITA
+  app.get('/summary', async (req, reply) => {
+    const q = z.object({ organization: z.nativeEnum(Organization) });
+    const parse = q.safeParse(req.query);
+    if (!parse.success) return reply.badRequest('Invalid query', parse.error.format());
+    const { organization } = parse.data;
+
+    // initial amount from OrganizationBudget (if present)
+    const budget = await prisma.organizationBudget.findUnique({ where: { organization } });
+    const initialAmount = budget?.initialAmount ? budget.initialAmount.toString() : '0.00';
+
+    // sum of montoTotal for paid invoices in that org (totalPagado)
+    const aggPaid = await prisma.invoice.aggregate({
+      where: { organization, paid: true },
+      _sum: { montoTotal: true }
+    });
+    const totalPagado = aggPaid._sum.montoTotal ? aggPaid._sum.montoTotal.toString() : '0.00';
+
+    // sum of montoTotal for ALL invoices in that org (totalAmount)
+    const aggTotal = await prisma.invoice.aggregate({
+      where: { organization },
+      _sum: { montoTotal: true }
+    });
+    const totalAmount = aggTotal._sum.montoTotal ? aggTotal._sum.montoTotal.toString() : '0.00';
+
+    // saldoRestante = initialAmount - totalPagado (as string with 2 decimals)
+    const ia = Number(initialAmount);
+    const tp = Number(totalPagado);
+    const saldo = (ia - tp).toFixed(2);
+
+    return reply.send({
+      organization,
+      initialAmount: Number.isFinite(ia) ? ia.toFixed(2) : '0.00',
+      totalAmount: Number.isFinite(Number(totalAmount)) ? Number(totalAmount).toFixed(2) : '0.00',
+      totalPagado: Number.isFinite(tp) ? tp.toFixed(2) : '0.00',
+      saldoRestante: saldo
+    });
+  });
+
+  // PATCH /invoices/organization-budget  -> upsert OrganizationBudget.initialAmount
+  const UpdateBudgetSchema = z.object({
+    organization: z.nativeEnum(Organization),
+    initialAmount: z.preprocess(
+      (v) => (typeof v === 'number' ? v.toString() : typeof v === 'string' ? v.trim() : v),
+      z.string().refine((s) => !Number.isNaN(Number(s)) && Number(s) >= 0, {
+        message: 'initialAmount must be a non-negative number (string or number)'
+      })
+    )
+  });
+
+  app.patch('/organization-budget', { preHandler: [app.authenticate, requireRole('ADMIN')] }, async (req, reply) => {
+    const parse = UpdateBudgetSchema.safeParse(req.body);
+    if (!parse.success) return reply.badRequest('Invalid body', parse.error.format());
+    const { organization, initialAmount } = parse.data;
+
+    const amt = Number(initialAmount).toFixed(2);
+
+    const budget = await prisma.organizationBudget.upsert({
+      where: { organization },
+      create: { organization, initialAmount: amt },
+      update: { initialAmount: amt },
+    });
+
+    return reply.send({
+      id: budget.id,
+      organization: budget.organization,
+      initialAmount: budget.initialAmount.toString(),
+      createdAt: budget.createdAt,
+      updatedAt: budget.updatedAt,
+    });
+  });
+
   // GET /invoices
   app.get('/', async (req, reply) => {
     const parse = ListQuerySchema.safeParse(req.query);

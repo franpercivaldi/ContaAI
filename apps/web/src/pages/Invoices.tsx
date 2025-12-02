@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
-import { Table, Tag, Space, Button, Input, Select, DatePicker, message, Popconfirm, Flex, Typography } from 'antd';
+import { Table, Tag, Space, Button, Input, Select, DatePicker, message, Popconfirm, Flex, Typography, Row, Col } from 'antd';
 import { IconDownload, IconEye, IconEnable } from '../components/icons';
 import PdfPreviewModal from '../components/PdfPreviewModal';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
-import { fetchInvoices, patchInvoice, ListParams, getInvoiceFileDownloadUrl } from '../features/invoices/api';
+import { fetchInvoices, patchInvoice, patchInvoicePaid, ListParams, getInvoiceFileDownloadUrl } from '../features/invoices/api';
 import { InvoiceItem } from '../features/invoices/types';
+import OrganizationTabs from '../components/OrganizationTabs';
+import OrganizationSummaryCard from '../components/OrganizationSummaryCard';
+import { Organization } from '../../../../packages/shared-types/src';
 import { getUser } from '../lib/auth';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
@@ -30,13 +33,15 @@ export default function Invoices() {
     sortDir: 'desc'
   });
   const [dates, setDates] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null] | null>(null);
+  const [organization, setOrganization] = useState<Organization | ''>('');
 
   const qc = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['invoices', params],
+    queryKey: ['invoices', params, organization],
     queryFn: () => fetchInvoices({
       ...params,
+      organization: organization || undefined,
       dateFrom: dates?.[0]?.format('YYYY-MM-DD'),
       dateTo: dates?.[1]?.format('YYYY-MM-DD'),
       estado_arca: params.estado_arca || undefined,
@@ -50,6 +55,17 @@ export default function Invoices() {
     onSuccess: () => {
       message.success('Actualizado');
       qc.invalidateQueries({ queryKey: ['invoices'] });
+    },
+    onError: (e: any) => message.error(e?.response?.data?.error?.message || 'Error actualizando')
+  });
+
+  const togglePaidMutation = useMutation({
+    mutationFn: ({ id, next }: { id: string; next: boolean }) => patchInvoicePaid(id, next),
+    onSuccess: () => {
+      message.success('Actualizado');
+      qc.invalidateQueries({ queryKey: ['invoices'] });
+      qc.invalidateQueries({ queryKey: ['invoice'] });
+      qc.invalidateQueries({ queryKey: ['org-summary', organization] });
     },
     onError: (e: any) => message.error(e?.response?.data?.error?.message || 'Error actualizando')
   });
@@ -135,6 +151,15 @@ export default function Invoices() {
         width: 130
       },
       {
+        title: 'Pagada',
+        dataIndex: 'paid',
+        key: 'paid',
+        render: (v: boolean) => (
+          <span className={`chip ${v ? 'chip-ok' : 'chip-disabled'}`}>{v ? 'Sí' : 'No'}</span>
+        ),
+        width: 110
+      },
+      {
         title: 'Archivo',
         key: 'file',
         width: 220,
@@ -172,6 +197,16 @@ export default function Invoices() {
                 </Button>
               </Popconfirm>
             )}
+            {!isAdmin && (
+              <Popconfirm
+                title={r.paid ? 'Marcar como no paga?' : 'Marcar como paga?'}
+                onConfirm={() => togglePaidMutation.mutate({ id: r.id, next: !r.paid })}
+              >
+                <Button size="small" loading={togglePaidMutation.isPending}>
+                  {r.paid ? 'Marcar NO' : 'Marcar SÍ'}
+                </Button>
+              </Popconfirm>
+            )}
           </div>
         )
       }
@@ -189,7 +224,10 @@ export default function Invoices() {
 
   return (
     <Space direction="vertical" style={{ width: '100%' }} size="large">
-      <Flex gap={12} wrap>
+      <Row gutter={16} align="middle" style={{ width: '100%' }}>
+        <Col xs={24} md={16}>
+          <div>
+            <Flex gap={12} wrap>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <Typography.Text style={{ marginBottom: 6, color: 'var(--text)' }} strong>
             Buscar
@@ -249,7 +287,17 @@ export default function Invoices() {
         <Typography.Text type="secondary" style={{ alignSelf: 'center' }}>
           {data?.total ?? 0} resultados
         </Typography.Text>
-      </Flex>
+            </Flex>
+          </div>
+        </Col>
+        <Col xs={24} md={8}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <OrganizationSummaryCard organization={organization} />
+          </div>
+        </Col>
+      </Row>
+
+      <OrganizationTabs value={organization} onChange={(o) => { setOrganization(o); setParams((p) => ({ ...p, page: 1 })); }} />
 
       <Table<InvoiceItem>
         rowKey="id"
